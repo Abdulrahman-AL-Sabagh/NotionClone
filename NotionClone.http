@@ -1,0 +1,6 @@
+@NotionClone_HostAddress = http://localhost:5094
+
+GET {{NotionClone_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
