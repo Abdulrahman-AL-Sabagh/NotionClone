@@ -1,0 +1,9 @@
+section {
+    display: flex;
+    justify-content: space-between;
+    width: fit-content;
+}
+
+section button {
+
+}

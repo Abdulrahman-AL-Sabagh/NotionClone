@@ -1,0 +1,24 @@
+/* You can add global styles to this file, and also import other style files */
+
+:root {
+    --bg-nav: hsl(0, 3%, 7%);
+    --bg: hsl(0, 4%, 10%);
+}
+* {
+    box-sizing: border-box;
+    
+}
+body {
+    margin: 0;
+    display: flex;
+    background-color: initial;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+input, textarea {
+    background-color: transparent;
+    outline: none;
+    border: none;
+}
