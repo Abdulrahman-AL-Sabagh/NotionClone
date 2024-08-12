@@ -9,13 +9,18 @@
         <button>more</button>
     
     </header>
-    <div class="content">
+    <div list class="content">
         <img src="" alt="">
         <app-edit-page></app-edit-page>
-        <input  placeholder="Untitled">
-        <textarea (change)="handleChange($event)" name="" id="">
-
-        </textarea>
-
+        <div
+        id="editors"
+            #editor 
+            (keydown)="handleChange($event)" 
+            contenteditable="true"
+            (blur)="handleBlur()"
+        > asdfasdfasdf</div>
     </div>
+    @if (this.optionsVisible) {
+    <app-dropdown [items]="['Header 1', 'Header 2', 'Header 3' ,'Image', 'Table' ]"></app-dropdown>
+    }
 </main>

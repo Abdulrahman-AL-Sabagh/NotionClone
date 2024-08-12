@@ -3,6 +3,9 @@
 :root {
     --bg-nav: hsl(0, 3%, 7%);
     --bg: hsl(0, 4%, 10%);
+    --fs-sm: 1.2rem;
+    --fs-md: 1.4rem;
+    --fs-lg: 1.6rem
 }
 * {
     box-sizing: border-box;
@@ -21,4 +24,7 @@ input, textarea {
     background-color: transparent;
     outline: none;
     border: none;
+}
+input {
+    font-size: 1.25rem;
 }
