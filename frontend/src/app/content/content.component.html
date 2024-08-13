@@ -12,15 +12,34 @@
     <div list class="content">
         <img src="" alt="">
         <app-edit-page></app-edit-page>
-        <div
-        id="editors"
-            #editor 
-            (keydown)="handleChange($event)" 
-            contenteditable="true"
-            (blur)="handleBlur()"
-        > asdfasdfasdf</div>
+        @for (item of this.content; track $index) {
+        
+        
+            <div
+                id="editors"
+                #editor 
+                (blur)="handleBlur()"
+                (input)="handleChange(item)"
+            > 
+                @switch (item.type) 
+                {
+                    @case  ("Blank") {
+                        @if (!this.isFocused()) {
+                        <input type="text" [disabled]="this.isFocused()" placeholder="Write something">
+                        }
+                    }
+
+                    @case ("Heading") {
+                        @if (this.isHeading(item)) {
+                            <app-title [elementId]="item.elementId" [text]="item.text" [level]="item.level"></app-title>
+                        }
+                    }
+                }
+            </div>
+        }
     </div>
+
     @if (this.optionsVisible) {
-    <app-dropdown [items]="['Header 1', 'Header 2', 'Header 3' ,'Image', 'Table' ]"></app-dropdown>
+    <app-dropdown [items]="this.dropdownItems"></app-dropdown>
     }
 </main>

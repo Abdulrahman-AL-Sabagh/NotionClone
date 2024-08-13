@@ -1,5 +1,6 @@
-<ul>
+<div class="dropdown" (focus)="handleFocus()" (mouseover)="handleFocus()">
+   <div class="dropdown-content">
    @for (item of items; track $index) {
-    <li>{{ item }}</li>
+      <button (click)="handleClick($index)">{{ item.name }}</button>
    }
-</ul>
+<div class="dropdown-content">

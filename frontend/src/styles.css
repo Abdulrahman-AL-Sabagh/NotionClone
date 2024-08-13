@@ -1,8 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
-    --bg-nav: hsl(0, 3%, 7%);
-    --bg: hsl(0, 4%, 10%);
+    --bg-nav: rgb(32, 32, 32);
+    --bg: rgb(25, 25, 25);
+    --dialog-color: rgb(37,37,37);
     --fs-sm: 1.2rem;
     --fs-md: 1.4rem;
     --fs-lg: 1.6rem
