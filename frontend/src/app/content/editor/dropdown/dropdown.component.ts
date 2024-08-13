@@ -22,16 +22,16 @@ export class DropdownComponent {
     console.log('button has been clicked');
     console.log(this.items[index]);
     this.items[index].handler();
-    this.store.store.next({
-      ...this.store.store.getValue(),
+    this.store.model.set({
+      ...this.store.model(),
       optionsVisible: false,
       dropdownIsFocused: false,
     });
   }
 
   handleFocus() {
-    this.store.store.next({
-      ...this.store.store.getValue(),
+    this.store.model.set({
+      ...this.store.model(),
       optionsVisible: true,
       dropdownIsFocused: true,
     });

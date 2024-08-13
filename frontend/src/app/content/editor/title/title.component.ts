@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { RichTextEditorService } from '../../../rich-text-editor.service';
 import { HeadingElement } from '../../../heading-element';
+import { EditorModel } from '../../../editor-model';
 
 @Component({
   selector: 'app-title',
@@ -20,8 +21,7 @@ export class TitleComponent {
   @ViewChild('ref', { static: false }) title!: ElementRef<HTMLHeadingElement>;
   @Input() elementId: string = '';
   @Input() text: string = '';
-  @Input() level: 1 | 2 | 3 = 1;
-  elementTitle = signal('');
+  @Input() level: HeadingElement['level'] = 1;
   className: WritableSignal<'' | 'placeholder'> = signal('');
 
   /**
@@ -29,39 +29,45 @@ export class TitleComponent {
    */
   constructor(private store: RichTextEditorService) {}
   ngOnInit() {
-    this.elementTitle.set(this.text || `Heading ${this.level}`);
-    this.className.set(this.text.length > 0 ? '' : 'placeholder');
+    this.text = this.text.length === 0 ? `Heading ${this.level}` : this.text;
+    this.className.set(
+      this.text === `Heading ${this.level}` ? 'placeholder' : ''
+    );
   }
 
   handleChange(event: Event) {
     const element = event.currentTarget as HTMLHeadingElement;
     this.store.checkIfSlashAppears(element.textContent || '', this.elementId);
-    this.elementTitle.set(element.textContent || '');
-    element.textContent = this.elementTitle();
-    this.store.updateElementText(this.elementId, this.elementTitle());
+    this.store.updateElementText(this.elementId, element.textContent || '');
   }
   handleFocus() {
     if (this.className() === 'placeholder') {
-      this.elementTitle.set('');
+      this.store.updateElementText(this.elementId, '');
       this.className.set('');
     }
   }
 
   handleBlur() {
-    if (this.elementTitle().length === 0) {
-      this.elementTitle.set(`Heading ${this.level}`);
+    console.log(this.text);
+    if (this.text.trim().length === 0) {
+      this.store.updateElementText(this.elementId, `Heading ${this.level}`);
       this.className.set('placeholder');
     }
-    if (!this.store.store.value.dropdownIsFocused) {
-      this.store.store.next({
-        ...this.store.store.value,
+    if (!this.store.model().dropdownIsFocused) {
+      this.store.model.set({
+        ...this.store.model(),
         optionsVisible: false,
       });
     }
   }
 
   handlePress(event: KeyboardEvent) {
-    this.title.nativeElement.focus();
-    console.log(event.key);
+    if (event.key === 'Enter') {
+      this.store.addElement('Heading', true)(3);
+    }
+    this.store.model.update((value) => ({
+      ...value,
+      enterClickedAt: this.elementId,
+    }));
   }
 }

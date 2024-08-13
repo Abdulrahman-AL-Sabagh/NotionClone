@@ -9,7 +9,7 @@
         (keypress)="handlePress($event)"
         contenteditable="true" #ref>
             
-            {{ this.elementTitle() }}</h1>
+            {{ this.text }}</h1>
     }
     @case (2) {
         <h2 
@@ -17,8 +17,9 @@
         (blur)="handleBlur()"
         (input)="handleChange($event)" 
         contenteditable="true"
-        (focus)="handleFocus()" 
-        #ref>{{   this.elementTitle() }}
+        (focus)="handleFocus()"
+        (keypress)="handlePress($event)" 
+        #ref>{{   this.text }}
         </h2>
     }
     @case (3) {
@@ -27,8 +28,9 @@
         (blur)="handleBlur()"
         (input)="handleChange($event)" 
         contenteditable="true"
-        (focus)="handleFocus()" 
-        #ref>{{   this.elementTitle() }}
+        (focus)="handleFocus()"
+        (keypress)="handlePress($event)" 
+        #ref>{{   this.text }}
         </h3>
     }
 }

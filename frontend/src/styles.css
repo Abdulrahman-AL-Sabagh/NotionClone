@@ -30,5 +30,7 @@ input {
     font-size: 1.25rem;
 }
 h1,h2,h3 {
-    margin: 0;
+    max-width: 30ch;
+    overflow-wrap: break-word;
+    white-space: normal;
 }

@@ -4,7 +4,8 @@ import { ImageElement } from './image-element';
 
 export interface EditorModel {
   optionsVisible: boolean;
-  content: ContentElement[];
+  content: Array<ImageElement | HeadingElement>;
   slashAppeardAt: string;
   dropdownIsFocused: boolean;
+  enterClickedAt: string;
 }

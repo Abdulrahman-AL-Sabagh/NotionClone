@@ -13,14 +13,12 @@
         <img src="" alt="">
         <app-edit-page></app-edit-page>
         <div id="content-elements">
-        @for (item of this.content; track $index) {
+        @for (item of this.content ; track $index) {
         
         
             <div
                 class="editor-content"
                 #editor 
-                (blur)="handleBlur()"
-                (input)="handleChange(item)"
             > 
                 @switch (item.type) 
                 {
@@ -32,14 +30,14 @@
 
                     @case ("Heading") {
                         @if (this.isHeading(item)) {
-                            <app-title [elementId]="item.elementId" [text]="item.text" [level]="item.level"></app-title>
+                            <app-title  [elementId]="item.elementId" [text]="item.text" [level]="item.level"></app-title>
                         }
                     }
                 }
             </div>
         }
 
-    @if (this.optionsVisible) {
+    @if (this.store.model().optionsVisible) {
     <app-dropdown [items]="this.dropdownItems"></app-dropdown>
     }
 </div>

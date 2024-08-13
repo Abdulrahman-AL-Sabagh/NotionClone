@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 import { BehaviorSubject, Head, map, take } from 'rxjs';
 import { HeadingElement } from './heading-element';
 import { ImageElement } from './image-element';
@@ -13,9 +13,10 @@ export class RichTextEditorService {
   pipe(arg0: any, arg1: any, arg2: any) {
     throw new Error('Method not implemented.');
   }
-  readonly store: BehaviorSubject<EditorModel>;
+  readonly model: WritableSignal<EditorModel>;
   constructor() {
-    this.store = new BehaviorSubject<EditorModel>({
+    this.model = signal({
+      enterClickedAt: '',
       dropdownIsFocused: false,
       slashAppeardAt: '',
       optionsVisible: false,
@@ -26,33 +27,41 @@ export class RichTextEditorService {
           level: 1,
 
           text: '',
-        } as HeadingElement,
+        },
         {
           elementId: 'heading-2',
           type: 'Heading',
           level: 2,
           text: '',
-        } as HeadingElement,
+        },
         {
           elementId: 'heading-3',
           type: 'Heading',
           level: 3,
           text: '',
-        } as HeadingElement,
+        },
       ],
     });
   }
 
   checkIfSlashAppears(value: string, elementId: string) {
-    this.store.next({
-      ...this.store.value,
-      optionsVisible: value.endsWith('/'),
+    console.log(value, elementId);
+    this.model.update((modelValue) => ({
+      ...modelValue,
+      optionsVisible: value.trimEnd().trimStart().endsWith('/'),
       slashAppeardAt: elementId,
-    });
+    }));
+    console.log(this.model().optionsVisible);
   }
-  addElement(type: 'Heading'): (level: 1 | 2 | 3) => void;
-  addElement(type: 'Image'): (src?: string, alt?: string) => void;
-  addElement(type: ContentElement['type']) {
+  addElement(
+    type: 'Heading',
+    enterClicked?: boolean
+  ): (level: 1 | 2 | 3) => void;
+  addElement(
+    type: 'Image',
+    enterClicked?: boolean
+  ): (src?: string, alt?: string) => void;
+  addElement(type: ContentElement['type'], enterClicked: boolean = false) {
     if (type === 'Heading') {
       return (level: 1 | 2 | 3) =>
         this.addElementToStore({
@@ -71,78 +80,73 @@ export class RichTextEditorService {
         });
     }
   }
-  private addElementToStore(element: HeadingElement | ImageElement) {
-    this.removeSlashFromElement();
-    this.store
-      .pipe(
-        take(1),
-        map((storeValue) => {
-          const indexOfElement = this.getTheArrayIndexOfTheElementId(
-            storeValue.slashAppeardAt
-          );
-          const content = [
-            ...storeValue.content.slice(0, indexOfElement),
-            element,
-            ...storeValue.content.slice(indexOfElement),
-          ];
+  private addElementToStore(
+    element: HeadingElement | ImageElement,
+    enterClicked: boolean = false
+  ) {
+    console.log(element);
+    if (!enterClicked) {
+      this.removeSlashFromElement();
+    }
+    const index = this.getTheArrayIndexOfTheElementId(
+      enterClicked ? this.model().enterClickedAt : this.model().slashAppeardAt
+    );
 
-          return { ...storeValue, content };
-        })
-      )
-      .subscribe((newState) => this.store.next(newState));
+    const arr1 = this.model().content.slice(0, index);
+    if (index === 0) {
+      arr1.push(this.model().content[0]);
+    }
+    arr1.push(element);
+    this.model.update((value) => ({
+      ...value,
+      content: arr1.concat(value.content.slice(index)),
+    }));
   }
 
   private removeSlashFromElement() {
     const indexOfElement = this.getTheArrayIndexOfTheElementId(
-      this.store.getValue().slashAppeardAt
+      this.model().slashAppeardAt
     );
+    const element = this.model().content[indexOfElement];
+    if (!('text' in element)) return;
 
-    this.store
-      .pipe(
-        take(1),
-        map((storeValue) => {
-          const element = storeValue.content[indexOfElement] as HeadingElement;
-          return {
-            ...storeValue,
-            content: this.updateElementInArray(storeValue.content, {
-              element,
-              text: element.text.replace('/', ''),
-            } as unknown as ContentElement),
-          };
-        })
-      )
-      .subscribe((newState) => this.store.next(newState));
+    this.model.update((value) => ({
+      ...value,
+      content: this.updateElementInArray(value.content, {
+        ...element,
+        text: element.text.replace('/', ''),
+      }),
+    }));
   }
 
   private getTheArrayIndexOfTheElementId(id: string): number {
-    return this.store
-      .getValue()
-      .content.findIndex((element) => element.elementId === id);
+    return this.model().content.findIndex(
+      (element) => element.elementId === id
+    );
   }
 
   updateElementText(id: string, text: string) {
     if (text.endsWith(' ')) {
       text = text.trimEnd();
     }
+
     const index = this.getTheArrayIndexOfTheElementId(id);
-    const element = this.store.getValue().content[index] as HeadingElement;
-    this.store
-      .pipe(
-        take(1),
-        map((storeValue) => ({
-          ...storeValue,
-          content: this.updateElementInArray(storeValue.content, {
-            ...element,
-            text,
-          } as HeadingElement),
-        }))
-      )
-      .subscribe((newState) => this.store.next(newState));
+    const element = this.model().content[index];
+    console.log(element);
+    if (!('text' in element)) return;
+    element;
+    this.model.update((value) => ({
+      ...value,
+      content: this.updateElementInArray(value.content, {
+        ...element,
+        text,
+      }),
+    }));
   }
 
   private updateElementInArray(
-    array: ContentElement[],
-    updatedElement: ContentElement
+    array: EditorModel['content'],
+    updatedElement: ImageElement | HeadingElement
   ) {
     return array.map((item) =>
       item.elementId === updatedElement.elementId ? updatedElement : item
