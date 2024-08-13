@@ -9,7 +9,7 @@
         (keypress)="handlePress($event)"
         contenteditable="true" #ref>
             
-            {{ this.text }}</h1>
+            {{ this.textState() }}</h1>
     }
     @case (2) {
         <h2 
@@ -19,7 +19,7 @@
         contenteditable="true"
         (focus)="handleFocus()"
         (keypress)="handlePress($event)" 
-        #ref>{{   this.text }}
+        #ref>{{   this.textState() }}
         </h2>
     }
     @case (3) {
@@ -30,7 +30,7 @@
         contenteditable="true"
         (focus)="handleFocus()"
         (keypress)="handlePress($event)" 
-        #ref>{{   this.text }}
+        #ref>{{   this.textState() }}
         </h3>
     }
 }

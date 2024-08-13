@@ -1,5 +1,6 @@
 import {
   Component,
+  effect,
   ElementRef,
   Input,
   signal,
@@ -23,16 +24,21 @@ export class TitleComponent {
   @Input() text: string = '';
   @Input() level: HeadingElement['level'] = 1;
   className: WritableSignal<'' | 'placeholder'> = signal('');
+  textState = signal('');
 
   /**
    *
    */
-  constructor(private store: RichTextEditorService) {}
+  constructor(private store: RichTextEditorService) {
+    effect(() => {
+      this.store.updateElementText(this.elementId, this.textState());
+    });
+  }
   ngOnInit() {
-    this.text = this.text.length === 0 ? `Heading ${this.level}` : this.text;
-    this.className.set(
-      this.text === `Heading ${this.level}` ? 'placeholder' : ''
+    this.textState.set(
+      this.text.length === 0 ? `Heading ${this.level}` : this.text
     );
+    this.className.set(this.text.length === 0 ? 'placeholder' : '');
   }
 
   handleChange(event: Event) {
@@ -42,7 +48,8 @@ export class TitleComponent {
   }
   handleFocus() {
     if (this.className() === 'placeholder') {
-      this.store.updateElementText(this.elementId, '');
+      this.textState.set('');
+      this.store.updateElementText(this.elementId, this.textState());
       this.className.set('');
     }
   }

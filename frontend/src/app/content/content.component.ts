@@ -44,6 +44,7 @@ export class ContentComponent implements OnInit {
     effect(
       () => {
         this.content = this.store.model().content;
+        console.log('This signal has been executed');
       },
       { allowSignalWrites: true }
     );
