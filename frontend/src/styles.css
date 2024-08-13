@@ -29,3 +29,6 @@ input, textarea {
 input {
     font-size: 1.25rem;
 }
+h1,h2,h3 {
+    margin: 0;
+}

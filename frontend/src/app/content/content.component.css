@@ -34,7 +34,17 @@ main .content {
 .content .title-input {
     font-size: 4rem;
 }
-#editor {
-    outline: none;
-    border: none;
+.editor-content {
+    width: 100%;
 }
+#content-elements {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 1em;
+    min-width: 600px;
+    padding: 2rem 1rem;
+    margin: auto;
+    z-index: 0;
+    
+} 

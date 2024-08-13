@@ -1,0 +1,19 @@
+:host {
+    position: relative;
+    z-index: 1;
+}
+h1,h2,h3 {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    border: none;
+    z-index: 10;
+}
+
+h1:focus-visible, h2:focus-visible, h3:focus-visible {
+    outline: none;
+    border: none;
+}
+.placeholder {
+    color :gray;
+}

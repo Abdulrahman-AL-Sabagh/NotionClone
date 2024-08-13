@@ -1,12 +1,34 @@
+
 @switch (this.level) {
     @case (1) {
-        <h1 (blur)="handleBlur()" (input)="handleChange($event)" contenteditable="true" #ref>{{ this.elementTitle() }}</h1>
+        <h1 
+        [className]="this.className()" 
+        (blur)="handleBlur()" 
+        (input)="handleChange($event)"
+        (focus)="handleFocus()" 
+        (keypress)="handlePress($event)"
+        contenteditable="true" #ref>
+            
+            {{ this.elementTitle() }}</h1>
     }
     @case (2) {
-        <h2  (blur)="handleBlur()"(change) = "handleChange($event)" (input)="handleChange($event)" contenteditable="true" #ref>{{ this.elementTitle() }}</h2>
+        <h2 
+        [className]="this.className()" 
+        (blur)="handleBlur()"
+        (input)="handleChange($event)" 
+        contenteditable="true"
+        (focus)="handleFocus()" 
+        #ref>{{   this.elementTitle() }}
+        </h2>
     }
     @case (3) {
-        <h3 (blur)="handleBlur()" (change) = "handleChange($event)" (input)="handleChange($event)" contenteditable="true" #ref>{{ this.elementTitle() }}</h3>
-
+        <h3 
+        [className]="this.className()" 
+        (blur)="handleBlur()"
+        (input)="handleChange($event)" 
+        contenteditable="true"
+        (focus)="handleFocus()" 
+        #ref>{{   this.elementTitle() }}
+        </h3>
     }
 }
