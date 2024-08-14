@@ -1,0 +1,58 @@
+
+@switch (this.level) {
+    @case (1) {
+        <h1 
+        [className]="this.className()" 
+        (blur)="handleBlur()" 
+        (input)="handleChange($event)"
+        (focus)="handleFocus()" 
+        (keydown)="handlePress($event)"
+        (click)="handleSelect($event)" 
+
+        contenteditable="true"
+        [innerHTML]="this.text"
+        #ref></h1>
+    }
+    @case (2) {
+        <h2 
+        [className]="this.className()"
+        (click)="handleSelect($event)" 
+        (blur)="handleBlur()"
+        (input)="handleChange($event)" 
+        contenteditable="true"
+        (focus)="handleFocus()"
+        (keydown)="handlePress($event)" 
+        [innerHTML]="this.text"
+        #ref>
+        </h2>
+    }
+    @case (3) {
+        <h3 
+        role="textbox"
+        [className]="this.className()" 
+        (blur)="handleBlur()"
+        (input)="handleChange($event)" 
+        contenteditable="true"
+        (focus)="handleFocus()"
+        (keydown)="handlePress($event)" 
+        (click)="handleSelect($event)" 
+        [innerHTML]="this.text"
+        #ref>
+        @if (this.title) {
+        {{this.title.nativeElement.innerHTML}}
+        }
+        </h3>
+    }
+    @case ("Paragraph") {
+        <div 
+        [className]="this.className()" 
+        (blur)="handleBlur()"
+        (input)="handleChange($event)" 
+        contenteditable="true"
+        (focus)="handleFocus()"
+        (keydown)="handlePress($event)" 
+        (click)="handleSelect($event)" 
+        [innerHTML]="this.text"
+        #ref></div>
+    }
+}

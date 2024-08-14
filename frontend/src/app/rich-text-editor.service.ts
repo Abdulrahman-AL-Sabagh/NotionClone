@@ -1,10 +1,11 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { BehaviorSubject, Head, map, take } from 'rxjs';
-import { HeadingElement } from './heading-element';
+import { TextElement } from './text-element';
 import { ImageElement } from './image-element';
 import { EditorModel } from './editor-model';
 import { v4 as uuidv4 } from 'uuid';
 import { ContentElement } from './content-element';
+import { verifyHostBindings } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root',
@@ -23,20 +24,20 @@ export class RichTextEditorService {
       content: [
         {
           elementId: 'heading-1',
-          type: 'Heading',
+          type: 'Text',
           level: 1,
 
           text: '',
         },
         {
           elementId: 'heading-2',
-          type: 'Heading',
+          type: 'Text',
           level: 2,
           text: '',
         },
         {
           elementId: 'heading-3',
-          type: 'Heading',
+          type: 'Text',
           level: 3,
           text: '',
         },
@@ -44,85 +45,32 @@ export class RichTextEditorService {
     });
   }
 
-  checkIfSlashAppears(value: string, elementId: string) {
-    console.log(value, elementId);
-    this.model.update((modelValue) => ({
-      ...modelValue,
-      optionsVisible: value.trimEnd().trimStart().endsWith('/'),
-      slashAppeardAt: elementId,
-    }));
-    console.log(this.model().optionsVisible);
-  }
   addElement(
-    type: 'Heading',
+    type: 'Text',
     enterClicked?: boolean
-  ): (level: 1 | 2 | 3) => void;
+  ): (level: TextElement['level']) => void;
   addElement(
     type: 'Image',
     enterClicked?: boolean
   ): (src?: string, alt?: string) => void;
   addElement(type: ContentElement['type'], enterClicked: boolean = false) {
-    if (type === 'Heading') {
-      return (level: 1 | 2 | 3) =>
-        this.addElementToStore({
-          type: 'Heading',
+    if (type === 'Text') {
+      return (level: TextElement['level']) =>
+        this.addTextElementToStore({
+          type: 'Text',
           elementId: uuidv4(),
           level: level,
           text: '',
         });
     } else {
       return (src = '', alt = '') =>
-        this.addElementToStore({
+        this.addImageElementTostore({
           type,
           elementId: uuidv4(),
           src,
           alt,
         });
     }
-  }
-  private addElementToStore(
-    element: HeadingElement | ImageElement,
-    enterClicked: boolean = false
-  ) {
-    console.log(element);
-    if (!enterClicked) {
-      this.removeSlashFromElement();
-    }
-    const index = this.getTheArrayIndexOfTheElementId(
-      enterClicked ? this.model().enterClickedAt : this.model().slashAppeardAt
-    );
-
-    const arr1 = this.model().content.slice(0, index);
-    if (index === 0) {
-      arr1.push(this.model().content[0]);
-    }
-    arr1.push(element);
-    this.model.update((value) => ({
-      ...value,
-      content: arr1.concat(value.content.slice(index)),
-    }));
-  }
-
-  private removeSlashFromElement() {
-    const indexOfElement = this.getTheArrayIndexOfTheElementId(
-      this.model().slashAppeardAt
-    );
-    const element = this.model().content[indexOfElement];
-    if (!('text' in element)) return;
-
-    this.model.update((value) => ({
-      ...value,
-      content: this.updateElementInArray(value.content, {
-        ...element,
-        text: element.text.replace('/', ''),
-      }),
-    }));
-  }
-
-  private getTheArrayIndexOfTheElementId(id: string): number {
-    return this.model().content.findIndex(
-      (element) => element.elementId === id
-    );
   }
 
   updateElementText(id: string, text: string) {
@@ -132,24 +80,101 @@ export class RichTextEditorService {
 
     const index = this.getTheArrayIndexOfTheElementId(id);
     const element = this.model().content[index];
-    console.log(element);
-    if (!('text' in element)) return;
-    element;
     this.model.update((value) => ({
       ...value,
+      optionsVisible: text.endsWith('/'),
       content: this.updateElementInArray(value.content, {
         ...element,
         text,
-      }),
+      } as TextElement),
     }));
+  }
+  deleteElement(elementId: string) {
+    this.model.update((value) => ({
+      ...value,
+      content: value.content.filter((item) => item.elementId !== elementId),
+    }));
+    this.model().content.length;
+  }
+
+  private addImageElementTostore(
+    element: ImageElement,
+    enterClicked: boolean = false
+  ) {}
+  private addTextElementToStore(
+    element: TextElement,
+    enterClicked: boolean = false
+  ) {
+    if (!enterClicked) {
+      this.removeSlashFromElement();
+    }
+    const index = this.getTheArrayIndexOfTheElementId(
+      enterClicked ? this.model().enterClickedAt : this.model().slashAppeardAt
+    );
+    let result: (ImageElement | TextElement)[] = [];
+    this.model().content;
+
+    const arr1 = this.model().content.slice(0, index);
+    if (index === 0) {
+      arr1.push(this.model().content[0]);
+    }
+    if (index === this.model().content.length - 1) {
+      result = [...this.model().content, element];
+    } else {
+      result = arr1.concat(this.model().content.slice(index));
+    }
+    result;
+    this.model.update((value) => ({
+      ...value,
+      content: result,
+      enterClickedAt: '',
+      slashAppeardAt: '',
+    }));
+  }
+  private removeSlashFromElement() {
+    const indexOfElement = this.getTheArrayIndexOfTheElementId(
+      this.model().slashAppeardAt
+    );
+    if (indexOfElement === -1) return;
+    const element = this.model().content[indexOfElement];
+    if (this.isHeading(element).valueOf()) {
+      element;
+      this.model.update((value) => ({
+        ...value,
+        content: this.updateElementInArray(value.content, {
+          ...element,
+          type: 'Text',
+          text: (element as TextElement).text.replace('/', ''),
+        }),
+      }));
+    }
+  }
+
+  private getTheArrayIndexOfTheElementId(id: string): number {
+    return this.model().content.findIndex(
+      (element) => element.elementId === id
+    );
   }
 
   private updateElementInArray(
     array: EditorModel['content'],
-    updatedElement: ImageElement | HeadingElement
+    updatedElement: ImageElement | TextElement
   ) {
     return array.map((item) =>
       item.elementId === updatedElement.elementId ? updatedElement : item
+    );
+  }
+
+  private isHeading(
+    element: TextElement | ImageElement
+  ): element is TextElement {
+    return (
+      element.type === 'Text' && (element as TextElement).text !== undefined
+    );
+  }
+  private isImage(element: TextElement | ImageElement) {
+    return (
+      element.type === 'Image' && (element as ImageElement).src !== undefined
     );
   }
 }

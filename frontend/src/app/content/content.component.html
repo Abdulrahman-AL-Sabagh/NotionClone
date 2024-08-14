@@ -28,7 +28,7 @@
                         }
                     }
 
-                    @case ("Heading") {
+                    @case ("Text") {
                         @if (this.isHeading(item)) {
                             <app-title  [elementId]="item.elementId" [text]="item.text" [level]="item.level"></app-title>
                         }
@@ -43,4 +43,5 @@
 </div>
 
     </div>
+    <app-floating-toolbar></app-floating-toolbar>
 </main>

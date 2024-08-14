@@ -3,7 +3,8 @@
 :root {
     --bg-nav: rgb(32, 32, 32);
     --bg: rgb(25, 25, 25);
-    --dialog-color: rgb(37,37,37);
+    --dialog-color: hsl(0, 0%, 15%);
+    --dialog-color-hover: hsl(0, 0%, 20%);
     --fs-sm: 1.2rem;
     --fs-md: 1.4rem;
     --fs-lg: 1.6rem
@@ -19,6 +20,7 @@ body {
     height: 100vh;
     overflow: hidden;
     position: relative;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 input, textarea {
