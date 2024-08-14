@@ -1,8 +1,10 @@
 import {
   Component,
   effect,
+  ElementRef,
   OnInit,
   signal,
+  ViewChild,
   WritableSignal,
 } from '@angular/core';
 import { EditPageComponent } from './edit-page/edit-page.component';
@@ -16,12 +18,18 @@ import { EditorDropdown } from '../editor-dropdown';
 
 import { EditorModel } from '../editor-model';
 import { AsyncPipe } from '@angular/common';
-import { FloatingToolbarComponent } from "./editor/floating-toolbar/floating-toolbar.component";
+import { FloatingToolbarComponent } from './editor/floating-toolbar/floating-toolbar.component';
 
 @Component({
   selector: 'app-content',
   standalone: true,
-  imports: [EditPageComponent, DropdownComponent, TextComponent, AsyncPipe, FloatingToolbarComponent],
+  imports: [
+    EditPageComponent,
+    DropdownComponent,
+    TextComponent,
+    AsyncPipe,
+    FloatingToolbarComponent,
+  ],
   templateUrl: './content.component.html',
   styleUrl: './content.component.css',
 })

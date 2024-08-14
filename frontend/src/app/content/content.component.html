@@ -18,7 +18,7 @@
         
             <div
                 class="editor-content"
-                #editor 
+                #editableParent 
             > 
                 @switch (item.type) 
                 {
@@ -30,7 +30,7 @@
 
                     @case ("Text") {
                         @if (this.isHeading(item)) {
-                            <app-title  [elementId]="item.elementId" [text]="item.text" [level]="item.level"></app-title>
+                            <app-title   [elementId]="item.elementId" [text]="item.text" [level]="item.level"></app-title>
                         }
                     }
                 }

@@ -8,8 +8,8 @@
         (focus)="handleFocus()" 
         (keydown)="handlePress($event)"
         (click)="handleSelect($event)" 
-
         contenteditable="true"
+        (keyup)="handleKeyUp()"
         [innerHTML]="this.text"
         #ref></h1>
     }
@@ -22,6 +22,7 @@
         contenteditable="true"
         (focus)="handleFocus()"
         (keydown)="handlePress($event)" 
+        (keyup)="handleKeyUp()"
         [innerHTML]="this.text"
         #ref>
         </h2>
@@ -35,12 +36,10 @@
         contenteditable="true"
         (focus)="handleFocus()"
         (keydown)="handlePress($event)" 
-        (click)="handleSelect($event)" 
+        (click)="handleSelect($event)"
+        (keyup)="handleKeyUp()"
         [innerHTML]="this.text"
         #ref>
-        @if (this.title) {
-        {{this.title.nativeElement.innerHTML}}
-        }
         </h3>
     }
     @case ("Paragraph") {
@@ -52,6 +51,7 @@
         (focus)="handleFocus()"
         (keydown)="handlePress($event)" 
         (click)="handleSelect($event)" 
+        (keyup)="handleKeyUp()"
         [innerHTML]="this.text"
         #ref></div>
     }

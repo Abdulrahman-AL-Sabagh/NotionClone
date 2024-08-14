@@ -1,7 +1,9 @@
 import {
+  AfterViewInit,
   Component,
   effect,
   ElementRef,
+  HostListener,
   Input,
   OnChanges,
   signal,
@@ -20,51 +22,37 @@ import { FloatingToolbarComponent } from '../floating-toolbar/floating-toolbar.c
   templateUrl: './text.component.html',
   styleUrl: './text.component.css',
 })
-export class TextComponent implements OnChanges {
-  @ViewChild('ref')
-  title!: ElementRef<HTMLHeadingElement>;
+export class TextComponent implements AfterViewInit {
   @Input() elementId: string = '';
   @Input() text: string = '';
   @Input() level: TextElement['level'] = 1;
+  @ViewChild('ref') title!: ElementRef<HTMLHeadingElement>;
   className: WritableSignal<'' | 'placeholder'> = signal('');
+  selectionChanged: WritableSignal<boolean> = signal(false);
+  x: number = 0;
+  y: number = 0;
+  currentOffset = 0;
+  constructor(private store: RichTextEditorService, private ref: ElementRef) {}
+  ngAfterViewInit(): void {}
 
-  constructor(private store: RichTextEditorService) {}
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes['text'].currentValue, 'text changes');
-    console.log(this.store.model().optionsVisible);
-    console.log(
-      (
-        this.store
-          .model()
-          .content.find(
-            (element) => element.elementId === this.elementId
-          ) as TextElement
-      ).text,
-      'Text in Element'
-    );
-  }
   ngOnInit() {
     this.updateTextState(
       this.text || `Heading ${this.level}`,
       this.text ? '' : 'placeholder'
     );
+    // document.addEventListener('selectionchange', this.handleSelect.bind(this));
   }
 
   handleChange(event: Event) {
     const element = event.currentTarget as HTMLHeadingElement;
     if (!element.textContent) return;
-    if (element.textContent.trim().length === 0) {
-      this.updateTextState(`Heading ${this.level}`, 'placeholder');
-      return;
-    }
-    this.updateTextState(element.textContent, '');
-    window
-      .getSelection()
-      ?.getRangeAt(0)
-      .setEnd(
-        this.title.nativeElement,
-        this.title.nativeElement.textContent!.length - 1
-      );
+
+    const fieldTextIsEmpty = element.textContent.trim().length === 0;
+    this.updateTextState(
+      fieldTextIsEmpty ? `Heading ${this.level}` : element.textContent,
+      fieldTextIsEmpty ? 'placeholder' : ''
+    );
+    setTimeout(() => this.handleJump(), 0);
   }
   handleFocus() {
     if (this.className() === 'placeholder') {
@@ -73,6 +61,7 @@ export class TextComponent implements OnChanges {
   }
 
   handleBlur() {
+    this.selectionChanged.set(false);
     if (this.text.trim().length === 0) {
       this.updateTextState(`Heading ${this.level}`, 'placeholder');
     }
@@ -82,6 +71,10 @@ export class TextComponent implements OnChanges {
         optionsVisible: false,
       });
     }
+  }
+
+  handleKeyUp() {
+    this.title.nativeElement.focus({ preventScroll: true });
   }
 
   handlePress(event: KeyboardEvent) {
@@ -102,8 +95,47 @@ export class TextComponent implements OnChanges {
     this.className.set(className);
     this.store.updateElementText(this.elementId, text);
   }
-  handleSelect(event: Event) {
-    console.log(window.getSelection());
-    console.log(event);
+  handleSelect(event: MouseEvent) {
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    this.x = event.clientX;
+    this.y = event.clientY;
+    const range = document.caretRangeFromPoint(this.x, this.y);
+    if (range) {
+      range.collapse(true);
+      console.log(range);
+      selection?.addRange(range);
+      this.currentOffset = range.startOffset + 1;
+    }
+    this.title.nativeElement.focus();
+  }
+  handleJump() {
+    this.title.nativeElement.focus();
+    const selection = window.getSelection();
+
+    let focusNode = selection?.focusNode;
+    if (!focusNode) return;
+    const range = document.caretRangeFromPoint(this.x, this.y);
+    if (this.currentOffset + 1 < this.text.length) {
+      this.currentOffset += 1;
+    }
+    range?.setStart(
+      range.endContainer,
+      range.endOffset === this.text.length
+        ? range.startOffset
+        : this.currentOffset
+    );
+    if (!range) return;
+    range.collapse(true);
+    this.title.nativeElement.ownerDocument;
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    this.title.nativeElement.focus();
+    console.log(
+      range.startOffset,
+      ' RANGE START OFFSET ',
+      range.endOffset,
+      'RANGE END OFFSET'
+    );
   }
 }
