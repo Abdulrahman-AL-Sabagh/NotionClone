@@ -62,7 +62,7 @@ export class RichTextEditorService {
     enterClicked?: boolean
   ): (src?: string, alt?: string) => void;
   addElement(type: ContentElement['type'], enterClicked: boolean = false) {
-    if (type === 'Text') {
+    if (type === 'Text' || enterClicked) {
       return (level: TextElement['level']) =>
         this.addTextElementToStore({
           type: 'Text',
@@ -117,9 +117,8 @@ export class RichTextEditorService {
     if (!enterClicked) {
       this.removeSlashFromElement();
     }
-    const index = this.getTheArrayIndexOfTheElementId(
-      enterClicked ? this.model().enterClickedAt : this.model().slashAppeardAt
-    );
+    const id = this.model().enterClickedAt || this.model().slashAppeardAt;
+    const index = this.getTheArrayIndexOfTheElementId(id);
     let result: (ImageElement | TextElement)[] = [];
     this.model().content;
 
@@ -160,9 +159,10 @@ export class RichTextEditorService {
   }
 
   private getTheArrayIndexOfTheElementId(id: string): number {
-    return this.model().content.findIndex(
-      (element) => element.elementId === id
-    );
+    return this.model().content.findIndex((element) => {
+      const x = element.elementId === id;
+      return x;
+    });
   }
 
   private updateElementInArray(
