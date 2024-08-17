@@ -2,57 +2,51 @@
 @switch (this.level) {
     @case (1) {
         <h1 
-        [className]="this.className()" 
+        [classList]="[this.className(),this.caretVisible()]" 
         (blur)="handleBlur()" 
-        (input)="handleChange($event)"
-        (focus)="handleFocus()" 
-        (keydown)="handlePress($event)"
-        (click)="handleSelect($event)" 
+        (keydown)="handleKeyDown($event)"
+        (focus)="handleFocus($event)" 
+        (click)="handleClick($event)" 
         contenteditable="true"
-        (keyup)="handleKeyUp()"
-        [innerHTML]="this.text"
+        (keyup)="handleKeyUp($event)"
+        [textContent]="this.text"
         #ref></h1>
     }
     @case (2) {
         <h2 
         [className]="this.className()"
-        (click)="handleSelect($event)" 
+        (click)="handleClick($event)" 
         (blur)="handleBlur()"
-        (input)="handleChange($event)" 
+        (keydown)="handleKeyDown($event)"  
         contenteditable="true"
-        (focus)="handleFocus()"
-        (keydown)="handlePress($event)" 
-        (keyup)="handleKeyUp()"
-        [innerHTML]="this.text"
-        #ref>
-        </h2>
+        (focus)="handleFocus($event)"
+        (keyup)="handleKeyUp($event)"
+        [textContent]="this.text"
+        #ref></h2>
     }
     @case (3) {
         <h3 
         role="textbox"
         [className]="this.className()" 
         (blur)="handleBlur()"
-        (input)="handleChange($event)" 
+        (keydown)="handleKeyDown($event)"  
         contenteditable="true"
-        (focus)="handleFocus()"
-        (keydown)="handlePress($event)" 
-        (click)="handleSelect($event)"
-        (keyup)="handleKeyUp()"
-        [innerHTML]="this.text"
-        #ref>
-        </h3>
+        (focus)="handleFocus($event)"
+        (click)="handleClick($event)"
+        (keyup)="handleKeyUp($event)"
+        [textContent]="this.text"
+        #ref></h3>
     }
     @case ("Paragraph") {
         <div 
         [className]="this.className()" 
         (blur)="handleBlur()"
-        (input)="handleChange($event)" 
         contenteditable="true"
-        (focus)="handleFocus()"
-        (keydown)="handlePress($event)" 
-        (click)="handleSelect($event)" 
-        (keyup)="handleKeyUp()"
-        [innerHTML]="this.text"
+        (focus)="handleFocus($event)"
+        (keydown)="handleKeyDown($event)"  
+        (click)="handleClick($event)" 
+        (keyup)="handleKeyUp($event)"
+        [textContent]="this.text"
         #ref></div>
     }
 }

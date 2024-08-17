@@ -23,15 +23,18 @@ import { FloatingToolbarComponent } from '../floating-toolbar/floating-toolbar.c
   styleUrl: './text.component.css',
 })
 export class TextComponent implements AfterViewInit {
+  @ViewChild('ref') title!: ElementRef<HTMLHeadingElement>;
   @Input() elementId: string = '';
   @Input() text: string = '';
   @Input() level: TextElement['level'] = 1;
-  @ViewChild('ref') title!: ElementRef<HTMLHeadingElement>;
+  @Input() hasPlaceHolder: boolean = false;
   className: WritableSignal<'' | 'placeholder'> = signal('');
   selectionChanged: WritableSignal<boolean> = signal(false);
   x: number = 0;
   y: number = 0;
   currentOffset = 0;
+  caretVisible: WritableSignal<'caret-invisible' | ''> = signal('');
+
   constructor(private store: RichTextEditorService, private ref: ElementRef) {}
   ngAfterViewInit(): void {}
 
@@ -43,24 +46,14 @@ export class TextComponent implements AfterViewInit {
     // document.addEventListener('selectionchange', this.handleSelect.bind(this));
   }
 
-  handleChange(event: Event) {
-    const element = event.currentTarget as HTMLHeadingElement;
-    if (!element.textContent) return;
-
-    const fieldTextIsEmpty = element.textContent.trim().length === 0;
-    this.updateTextState(
-      fieldTextIsEmpty ? `Heading ${this.level}` : element.textContent,
-      fieldTextIsEmpty ? 'placeholder' : ''
-    );
-    setTimeout(() => this.handleJump(), 0);
-  }
-  handleFocus() {
+  handleFocus(e: FocusEvent) {
     if (this.className() === 'placeholder') {
       this.updateTextState('', '');
     }
   }
 
   handleBlur() {
+    this.caretVisible.set('');
     this.selectionChanged.set(false);
     if (this.text.trim().length === 0) {
       this.updateTextState(`Heading ${this.level}`, 'placeholder');
@@ -71,17 +64,30 @@ export class TextComponent implements AfterViewInit {
         optionsVisible: false,
       });
     }
+    this.store.model.update((value) => ({
+      ...value,
+      floatingToolbar: { ...value.floatingToolbar, isVisible: false },
+    }));
+  }
+  handleDoubleClick(e: MouseEvent) {
+    e.preventDefault();
   }
 
-  handleKeyUp() {
-    this.title.nativeElement.focus({ preventScroll: true });
+  handleKeyUp(event: KeyboardEvent) {
+    this.updateTextState(this.title.nativeElement.textContent || '');
+    setTimeout(() => this.moveCaret(), 0);
   }
 
-  handlePress(event: KeyboardEvent) {
-    if (event.key === 'Backspace' && this.text.length === 0) {
-      this.store.deleteElement(this.elementId);
-      return;
+  handleKeyDown(event: KeyboardEvent) {
+    const element = event.target as HTMLElement;
+    this.caretVisible.set('caret-invisible');
+    if (event.key === 'Backspace') {
+      if (this.text.length === 0) {
+        this.store.deleteElement(this.elementId);
+        return;
+      }
     }
+
     if (event.key === 'Enter') {
       this.store.model.update((value) => ({
         ...value,
@@ -90,52 +96,47 @@ export class TextComponent implements AfterViewInit {
       this.store.addElement('Text', true)('Paragraph');
       return;
     }
+    this.currentOffset++;
   }
   updateTextState(text: string, className: 'placeholder' | '' = '') {
     this.className.set(className);
     this.store.updateElementText(this.elementId, text);
+    if (!this.hasPlaceHolder) {
+    }
   }
-  handleSelect(event: MouseEvent) {
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
+  handleClick(event: MouseEvent) {
     this.x = event.clientX;
     this.y = event.clientY;
     const range = document.caretRangeFromPoint(this.x, this.y);
     if (range) {
-      range.collapse(true);
-      console.log(range);
-      selection?.addRange(range);
-      this.currentOffset = range.startOffset + 1;
+      this.currentOffset = range.startOffset;
+      this.moveCaret();
     }
-    this.title.nativeElement.focus();
   }
-  handleJump() {
-    this.title.nativeElement.focus();
+
+  private moveCaret() {
+    if (this.currentOffset > this.text.length) {
+      this.currentOffset = this.text.length;
+      return;
+    }
     const selection = window.getSelection();
 
-    let focusNode = selection?.focusNode;
-    if (!focusNode) return;
     const range = document.caretRangeFromPoint(this.x, this.y);
-    if (this.currentOffset + 1 < this.text.length) {
-      this.currentOffset += 1;
-    }
-    range?.setStart(
-      range.endContainer,
-      range.endOffset === this.text.length
-        ? range.startOffset
-        : this.currentOffset
-    );
+
+    range?.setStart(range.endContainer, this.currentOffset);
+    range?.setEnd(range.endContainer, this.text.length);
     if (!range) return;
     range.collapse(true);
-    this.title.nativeElement.ownerDocument;
-    selection?.removeAllRanges();
+    if (selection?.anchorOffset == selection?.focusOffset) {
+      selection?.removeAllRanges();
+      this.store.updateFloatingToolbar({ isVisible: false });
+    } else {
+      this.store.updateFloatingToolbar({
+        isVisible: true,
+        x: this.x,
+        y: this.y,
+      });
+    }
     selection?.addRange(range);
-    this.title.nativeElement.focus();
-    console.log(
-      range.startOffset,
-      ' RANGE START OFFSET ',
-      range.endOffset,
-      'RANGE END OFFSET'
-    );
   }
 }

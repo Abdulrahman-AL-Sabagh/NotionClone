@@ -4,6 +4,7 @@ div {
     display: flex;
     justify-content: space-between;
     background-color: var(--dialog-color);
+    position: absolute;
 }
 div span {
     cursor: pointer;

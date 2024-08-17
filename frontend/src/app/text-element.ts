@@ -4,6 +4,7 @@ export interface TextElement extends ContentElement {
   type: 'Text';
   level: 1 | 2 | 3 | 'Paragraph';
   text: string;
+  hasPlaceHolder: boolean;
   children?: {
     startsAt: number;
     endsAt: number;

@@ -8,4 +8,10 @@ export interface EditorModel {
   slashAppeardAt: string;
   dropdownIsFocused: boolean;
   enterClickedAt: string;
+  selection: Selection | null;
+  floatingToolbar: {
+    isVisible: boolean;
+    top: number;
+    left: number;
+  };
 }

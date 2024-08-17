@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { BehaviorSubject, Head, map, take } from 'rxjs';
+import { BehaviorSubject, Head, map, take, windowWhen } from 'rxjs';
 import { TextElement } from './text-element';
 import { ImageElement } from './image-element';
 import { EditorModel } from './editor-model';
@@ -17,29 +17,37 @@ export class RichTextEditorService {
   readonly model: WritableSignal<EditorModel>;
   constructor() {
     this.model = signal({
+      selection: window.getSelection(),
       enterClickedAt: '',
       dropdownIsFocused: false,
       slashAppeardAt: '',
       optionsVisible: false,
+      floatingToolbar: {
+        isVisible: false,
+        left: 0,
+        top: 0,
+      },
       content: [
         {
           elementId: 'heading-1',
           type: 'Text',
           level: 1,
-
           text: '',
+          hasPlaceHolder: true,
         },
         {
           elementId: 'heading-2',
           type: 'Text',
           level: 2,
           text: '',
+          hasPlaceHolder: true,
         },
         {
           elementId: 'heading-3',
           type: 'Text',
           level: 3,
           text: '',
+          hasPlaceHolder: true,
         },
       ],
     });
@@ -61,6 +69,7 @@ export class RichTextEditorService {
           elementId: uuidv4(),
           level: level,
           text: '',
+          hasPlaceHolder: true,
         });
     } else {
       return (src = '', alt = '') =>
@@ -176,5 +185,16 @@ export class RichTextEditorService {
     return (
       element.type === 'Image' && (element as ImageElement).src !== undefined
     );
+  }
+
+  updateFloatingToolbar(conf: { isVisible: boolean; x?: number; y?: number }) {
+    this.model.update((value) => ({
+      ...value,
+      floatingToolbar: {
+        isVisible: conf.isVisible,
+        left: conf.x || 0,
+        top: conf.y || 0,
+      },
+    }));
   }
 }

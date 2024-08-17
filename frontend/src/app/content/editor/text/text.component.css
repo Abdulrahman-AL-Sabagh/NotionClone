@@ -9,6 +9,7 @@ h1,h2,h3,p {
     text-align: left;
     border: none;
     z-index: 10;
+    caret-color: white;
 }
 
 h1:focus-visible, h2:focus-visible, h3:focus-visible {
@@ -17,4 +18,8 @@ h1:focus-visible, h2:focus-visible, h3:focus-visible {
 }
 .placeholder {
     color :gray;
+}
+
+.caret-invisible {
+    caret-color: transparent;
 }
