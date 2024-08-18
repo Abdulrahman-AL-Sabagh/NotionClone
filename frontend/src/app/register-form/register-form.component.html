@@ -1,0 +1,19 @@
+<form [formGroup]="form" action="">
+    <div>
+        <label>Username</label>
+        <input formControlName="username" type="text" >
+    </div>
+    <div>
+        <label for="">Email</label>
+        <input formControlName="email" type="email">
+    </div>
+    <div>
+        <label for="">Password</label>
+        <input formControlName="password" type="password">
+    </div>
+    <div>
+        <label for="">Repeat password</label>
+        <input formControlName="repeatPassword" type="password">
+    </div>
+    <button type="submit">Create my new account</button>
+</form>
