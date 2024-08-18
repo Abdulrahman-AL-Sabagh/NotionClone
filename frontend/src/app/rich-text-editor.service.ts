@@ -1,19 +1,15 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { BehaviorSubject, Head, map, take, windowWhen } from 'rxjs';
 import { TextElement } from './text-element';
 import { ImageElement } from './image-element';
 import { EditorModel } from './editor-model';
 import { v4 as uuidv4 } from 'uuid';
 import { ContentElement } from './content-element';
-import { verifyHostBindings } from '@angular/compiler';
+import { TextElementChild } from './text-element-child';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RichTextEditorService {
-  pipe(arg0: any, arg1: any, arg2: any) {
-    throw new Error('Method not implemented.');
-  }
   readonly model: WritableSignal<EditorModel>;
   constructor() {
     this.model = signal({
@@ -22,8 +18,13 @@ export class RichTextEditorService {
       dropdownIsFocused: false,
       slashAppeardAt: '',
       optionsVisible: false,
+      focusedElementId: '',
       floatingToolbar: {
+        isFocused: false,
         isVisible: false,
+        boldIsActive: false,
+        italicIsActive: false,
+        lineThroughIsActive: false,
         left: 0,
         top: 0,
       },
@@ -32,8 +33,15 @@ export class RichTextEditorService {
           elementId: 'heading-1',
           type: 'Text',
           level: 1,
-          text: '',
-          hasPlaceHolder: true,
+          text: 'Hello World',
+          hasPlaceHolder: false,
+          children: [
+            {
+              startsAt: 0,
+              endsAt: 5,
+              style: new Set(['bold']),
+            },
+          ],
         },
         {
           elementId: 'heading-2',
@@ -41,6 +49,7 @@ export class RichTextEditorService {
           level: 2,
           text: '',
           hasPlaceHolder: true,
+          children: [],
         },
         {
           elementId: 'heading-3',
@@ -48,6 +57,7 @@ export class RichTextEditorService {
           level: 3,
           text: '',
           hasPlaceHolder: true,
+          children: [],
         },
       ],
     });
@@ -70,6 +80,7 @@ export class RichTextEditorService {
           level: level,
           text: '',
           hasPlaceHolder: true,
+          children: [],
         });
     } else {
       return (src = '', alt = '') =>
@@ -187,14 +198,103 @@ export class RichTextEditorService {
     );
   }
 
-  updateFloatingToolbar(conf: { isVisible: boolean; x?: number; y?: number }) {
+  updateFloatingToolbar(conf: {
+    isVisible: boolean;
+    isFocused?: boolean;
+    boldIsActive?: boolean;
+    italicIsActive?: boolean;
+    lineThroughIsActive?: boolean;
+    x?: number;
+    y?: number;
+  }) {
     this.model.update((value) => ({
       ...value,
       floatingToolbar: {
         isVisible: conf.isVisible,
         left: conf.x || 0,
         top: conf.y || 0,
+        isFocused: conf.isFocused || false,
+        lineThroughIsActive: conf.lineThroughIsActive || false,
+        boldIsActive: conf.boldIsActive || false,
+        italicIsActive: conf.italicIsActive || false,
       },
     }));
+  }
+  appendChildToElement(style: 'bold' | 'italic' | 'line-through') {
+    console.log(' adding child');
+    const modelCopy = { ...this.model() };
+    const index = this.getTheArrayIndexOfTheElementId(
+      this.model().focusedElementId
+    );
+    const selection = modelCopy.selection;
+    if (!selection) return;
+    const startsAt = selection.anchorOffset;
+    const endsAt = selection.focusOffset;
+    const textElement = modelCopy.content[index] as TextElement;
+    const child = this.getChildIfExistsOrCreateANewOne(
+      {
+        startsAt,
+        endsAt,
+      },
+      textElement.children,
+      style
+    );
+
+    let updatedTextElement = { ...textElement };
+    if (!child) {
+      const newChild: TextElementChild = {
+        startsAt,
+        endsAt,
+        style: new Set([style]),
+      };
+      updatedTextElement = {
+        ...textElement,
+        children: [...textElement.children, newChild],
+      };
+    }
+    if (child) {
+      if (child.style.has(style)) {
+        child.style.delete(style);
+        if ([...child.style].length === 0) {
+          updatedTextElement = {
+            ...textElement,
+            children: textElement.children.filter((item) => item !== child),
+          };
+        }
+      } else {
+        // @ts-ignore
+        const indexOfChild = textElement.children.indexOf(child);
+        updatedTextElement = {
+          ...textElement,
+          children: [
+            ...textElement.children.slice(0, indexOfChild),
+            { ...child, style: new Set([...child.style, style]) },
+            ...textElement.children.slice(indexOfChild),
+          ],
+        };
+      }
+    }
+
+    // Update the content array with the updated text element
+    const newContent = this.model().content.map((item, idx) =>
+      idx === index ? updatedTextElement : item
+    );
+
+    this.model.update((value) => ({ ...value, content: newContent }));
+    console.log((this.model().content[index] as TextElement).children);
+  }
+
+  private getChildIfExistsOrCreateANewOne(
+    coordinates: { startsAt: number; endsAt: number },
+    array: TextElementChild[],
+    style: 'bold' | 'italic' | 'line-through'
+  ): TextElementChild | undefined {
+    return (
+      array.filter(
+        (item) =>
+          item.startsAt === coordinates.startsAt &&
+          item.endsAt === coordinates.endsAt
+      )[0] || undefined
+    );
   }
 }

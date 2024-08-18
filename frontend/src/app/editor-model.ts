@@ -9,9 +9,14 @@ export interface EditorModel {
   dropdownIsFocused: boolean;
   enterClickedAt: string;
   selection: Selection | null;
+  focusedElementId: string;
   floatingToolbar: {
+    isFocused: boolean;
     isVisible: boolean;
     top: number;
     left: number;
+    boldIsActive: boolean;
+    italicIsActive: boolean;
+    lineThroughIsActive: boolean;
   };
 }

@@ -1,16 +1,12 @@
 import {
   AfterViewInit,
   Component,
-  effect,
   ElementRef,
-  HostBinding,
   Input,
   OnChanges,
   Renderer2,
-  signal,
   SimpleChanges,
   ViewChild,
-  WritableSignal,
 } from '@angular/core';
 import { RichTextEditorService } from '../../../rich-text-editor.service';
 
@@ -36,5 +32,18 @@ export class FloatingToolbarComponent implements AfterViewInit, OnChanges {
   ngAfterViewInit(): void {
     this.renderer.setStyle(this.ref.nativeElement, 'left', `${this.x}px`);
     this.renderer.setStyle(this.ref.nativeElement, 'top', `${this.y}px`);
+  }
+  handleMouseOver(event: MouseEvent) {
+    this.store.updateFloatingToolbar({ isVisible: true, isFocused: true });
+  }
+
+  convertToLineThrough() {
+    this.store.appendChildToElement('line-through');
+  }
+  convertToItalic() {
+    this.store.appendChildToElement('italic');
+  }
+  convertToBold() {
+    this.store.appendChildToElement('bold');
   }
 }

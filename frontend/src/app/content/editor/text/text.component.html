@@ -9,7 +9,7 @@
         (click)="handleClick($event)" 
         contenteditable="true"
         (keyup)="handleKeyUp($event)"
-        [textContent]="this.text"
+        [innerHTML]="html"
         #ref></h1>
     }
     @case (2) {
@@ -21,7 +21,7 @@
         contenteditable="true"
         (focus)="handleFocus($event)"
         (keyup)="handleKeyUp($event)"
-        [textContent]="this.text"
+        [innerHTML]="html"
         #ref></h2>
     }
     @case (3) {
@@ -34,7 +34,7 @@
         (focus)="handleFocus($event)"
         (click)="handleClick($event)"
         (keyup)="handleKeyUp($event)"
-        [textContent]="this.text"
+        [innerHTML]="html"
         #ref></h3>
     }
     @case ("Paragraph") {
@@ -46,7 +46,7 @@
         (keydown)="handleKeyDown($event)"  
         (click)="handleClick($event)" 
         (keyup)="handleKeyUp($event)"
-        [textContent]="this.text"
+        [innerHTML]="html"
         #ref></div>
     }
 }

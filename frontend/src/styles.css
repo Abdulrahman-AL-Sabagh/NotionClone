@@ -5,7 +5,8 @@
     --bg: rgb(25, 25, 25);
     --dialog-color: hsl(0, 0%, 15%);
     --dialog-color-hover: hsl(0, 0%, 20%);
-    --fs-sm: 1.2rem;
+    --dialog-color-active: hsl(0,0,23%);
+    --fs-sm: 1rem;
     --fs-md: 1.4rem;
     --fs-lg: 1.6rem
 }
@@ -23,16 +24,20 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-input, textarea {
-    background-color: transparent;
-    outline: none;
-    border: none;
-}
-input {
-    font-size: 1.25rem;
-}
 h1,h2,h3 {
     max-width: 30ch;
     overflow-wrap: break-word;
     white-space: normal;
+    line-height: 20px;
+}
+
+.bold {
+    font-weight: 800;
+}
+.italic {
+    font-style: italic;
+}
+
+.line-through {
+    text-decoration: line-through;
 }

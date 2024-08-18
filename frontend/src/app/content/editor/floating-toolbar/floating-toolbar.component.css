@@ -6,13 +6,20 @@ div {
     background-color: var(--dialog-color);
     position: absolute;
 }
-div span {
+div button {
+    background-color: transparent;
+    color: white;
+    outline: none;
+    border: none;
     cursor: pointer;
     width: 100%;
     padding: 1rem 0.5rem;
     text-align: center;
-    transition: background-color .3s ease-in-out;
+    transition: background-color 100ms ease-in-out;
 }
-div span:hover {
+div :hover {
     background-color: var(--dialog-color-hover);
+}
+div :active {
+    background-color: var(--dialog-color-active);    
 }
