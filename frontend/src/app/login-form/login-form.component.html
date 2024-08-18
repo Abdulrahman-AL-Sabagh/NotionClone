@@ -1,0 +1,13 @@
+<form (submit)="handleSubmit($event)" [formGroup]="this.form">
+    <button>Login with google</button>
+    <div>
+    <label>email</label>
+    <input formControlName="email" type="email" required>
+</div>
+<div>
+    <label>password</label>
+    <input formControlName="password" type="password" required>
+</div>
+    <button type="submit">Continue</button>
+</form>
+
